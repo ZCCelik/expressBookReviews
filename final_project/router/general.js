@@ -23,6 +23,7 @@ public_users.post("/register", (req,res) => {
     return res.status(404).json({message: "Unable to register user."});
 });
 
+//Get all books using promises
 public_users.get('/', function (req, res) {
   const promise = new Promise((resolve, reject) => {
     setTimeout(() => {
@@ -39,16 +40,27 @@ public_users.get('/', function (req, res) {
     });
 });
 
-// Get book details based on ISBN
+
+// Get books details based on ISBN with promises
 public_users.get('/isbn/:isbn', function (req, res) {
   const isbn = req.params.isbn;
-  const book = books[isbn];
 
-  if (book) {
-    res.send(book);
-  } else {
-    res.status(404).send({ error: "Book not found" }); 
-  }
+  const promise = new Promise((resolve, reject) => {
+    const book = books[isbn];
+    if (book) {
+      resolve(book); // Resolve with the book details
+    } else {
+      reject("Book not found");
+    }
+  });
+
+  promise
+    .then((bookDetails) => {
+      res.status(200).json(bookDetails);
+    })
+    .catch((error) => {
+      res.status(404).json({ error });
+    });
 });
 
   
