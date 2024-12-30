@@ -66,33 +66,54 @@ public_users.get('/isbn/:isbn', function (req, res) {
   
 // Get book details based on author
 public_users.get('/author/:author', function (req, res) {
-  const author = req.params.author.toLowerCase(); 
-  const booksByAuthor = Object.values(books).filter(
-    (book) => book.author.toLowerCase() === author
-  );
+  const author = req.params.author.toLowerCase();
 
-  if (booksByAuthor.length > 0) {
-    res.send(booksByAuthor);
-  } else {
-    res.status(404).send({ error: "No books found for this author" });
-  }
+  const promise = new Promise((resolve, reject) => {
+    const booksByAuthor = Object.values(books).filter(
+      (book) => book.author.toLowerCase() === author
+    );
+
+    if (booksByAuthor.length > 0) {
+      resolve(booksByAuthor);
+    } else {
+      reject("No books found for this author");
+    }
+  });
+
+  promise
+    .then((result) => {
+      res.status(200).json(result);
+    })
+    .catch((error) => {
+      res.status(404).json({ error });
+    });
 });
 
 
 // Get all books based on title
-public_users.get('/title/:title',function (req, res) {
-  const title = req.params.title.toLowerCase(); 
-  const booksWithTitle = Object.values(books).filter(
-    (book) => book.title.toLowerCase() === title
-  );
+public_users.get('/title/:title', function (req, res) {
+  const title = req.params.title.toLowerCase();
 
-  if (booksWithTitle.length > 0) {
-    res.send(booksWithTitle);
-  } else {
-    res.status(404).send({ error: "No books found with this title" });
-  }
+  const promise = new Promise((resolve, reject) => {
+    const booksWithTitle = Object.values(books).filter(
+      (book) => book.title.toLowerCase() === title
+    );
+
+    if (booksWithTitle.length > 0) {
+      resolve(booksWithTitle);
+    } else {
+      reject("No books found with this title");
+    }
+  });
+
+  promise
+    .then((result) => {
+      res.status(200).json(result); // Send the resolved books data
+    })
+    .catch((error) => {
+      res.status(404).json({ error }); // Send the error message if rejected
+    });
 });
-
 //  Get book review
 public_users.get('/review/:isbn',function (req, res) {
   const isbn = req.params.isbn;
